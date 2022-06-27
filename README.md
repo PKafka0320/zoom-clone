@@ -14,7 +14,11 @@ Zoom clone using NodeJS, WebRTC, Websockets
 
 # pug
 
+- view engine
+
 # express
+
+- web framework for NodeJS
 
 # tips
 
