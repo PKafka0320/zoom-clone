@@ -1,17 +1,47 @@
 import express from "express";
+import http from "http";
+import WebSocket from "ws";
 
 const app = express();
 
-app.set("view engine", "pug"); // setting view engine
-app.set("views", __dirname + "/views"); // setting directory of views
+// setting view engine
+app.set("view engine", "pug");
+// setting directory of views
+app.set("views", __dirname + "/views");
 
-app.use("/public", express.static(__dirname + "/public")); // setting directory of files
+// setting directory of files
+app.use("/public", express.static(__dirname + "/public"));
 // public files will be executed in frontend
 
 // rendering for each address
 app.get("/", (req, res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"));
 
-// opening port
+// create http server
+// for views, static files, home, redirection
+const server = http.createServer(app);
+// create web socket server
+const wss = new WebSocket.Server({ server });
+
+// socket fucntion
+function onSocketClose() {
+  console.log("Disconnected from the Browser.");
+}
+
+function onSocketMessage(message) {
+  console.log(message.toString());
+}
+
+// web socket event
+wss.on("connection", (socket) => {
+  console.log("Connected to Browser.");
+  // close event
+  socket.on("close", onSocketClose);
+  // message receive event
+  socket.on("message", onSocketMessage);
+  socket.send("hello");
+});
+
+// openieng server
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
-app.listen(3000, handleListen);
+server.listen(3000, handleListen);

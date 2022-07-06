@@ -20,6 +20,8 @@ Zoom clone using NodeJS, WebRTC, Websockets
 
 - web framework for NodeJS
 
+# WebSocket
+
 # tips
 
 1. npm init -y
