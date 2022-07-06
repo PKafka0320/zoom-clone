@@ -32,14 +32,28 @@ function onSocketMessage(message) {
   console.log(message.toString());
 }
 
+// connected socket list
+const sockets = [];
+
 // web socket event
 wss.on("connection", (socket) => {
+  sockets.push(socket);
+  socket["nickname"] = "Anon";
   console.log("Connected to Browser.");
   // close event
   socket.on("close", onSocketClose);
   // message receive event
-  socket.on("message", onSocketMessage);
-  socket.send("hello");
+  socket.on("message", (msg) => {
+    const message = JSON.parse(msg);
+    switch (message.type) {
+      case "new_message":
+        sockets.forEach((aSocket) =>
+          aSocket.send(`${socket.nickname}: ${message.payload.toString()}`)
+        );
+      case "nickname":
+        socket["nickname"] = message.payload;
+    }
+  });
 });
 
 // openieng server
