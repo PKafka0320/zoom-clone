@@ -28,22 +28,27 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
 wsServer.on("connection", (socket) => {
-  socket.onAny((event) => {
+  // socket["nickname"] = "Anon"; // initialize nickname
+  socket.onAny((event) => { // show event
     console.log(`Socket Event: ${event}`);
   });
-  socket.on("enter_room", (roomName, done) => {
+  socket.on("enter_room", (roomName, nickname, done) => {
+    socket["nickname"] = nickname;
     socket.join(roomName);
     /* run a function in front-end for the purpose of security */
     done(); // send a message that sequence is done
-    socket.to(roomName).emit("welcome");
+    socket.to(roomName).emit("welcome", socket.nickname);
   });
-  socket.on("disconnecting", () => {
-    socket.rooms.forEach((room) => socket.to(room).emit("bye")); // send event to rooms that the socket connected
+  socket.on("disconnecting", () => { // send event to rooms that the socket connected
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("bye", socket.nickname)
+    );
   });
-  socket.on("new_message", (msg, room, done) => {
-    socket.to(room).emit("new_message", msg); // send event to a room that the socket wants to send message
+  socket.on("new_message", (msg, room, done) => { // send event to a room that the socket wants to send message
+    socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
     done();
   });
+  // socket.on("nickname", (nickname) => (socket["nickname"] = nickname)); // set nickname
 });
 
 // openieng server

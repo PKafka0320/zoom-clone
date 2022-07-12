@@ -5,6 +5,8 @@ chat service with NodeJS, WebRTC, Websockets
 ## functions
 
 - creating & entering chat room
+- sending & receiving message
+- setting nickname
 
 # dependencies
 

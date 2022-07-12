@@ -19,7 +19,7 @@ function addMessage(message) {
 // sending message
 function handleMessageSubmit(event) {
   event.preventDefault();
-  const input = room.querySelector("input"); // find message box
+  const input = room.querySelector("#msg input"); // find message box
   const value = input.value; // store value of input
   socket.emit("new_message", input.value, roomName, () => {
     // send message to a room
@@ -28,23 +28,34 @@ function handleMessageSubmit(event) {
   input.value = ""; // reset input box
 }
 
+/* // setting nickname
+function handleNicknameSubmit(event) {
+  event.preventDefault();
+  const input = room.querySelector("#name input"); // find nickname box
+  socket.emit("nickname", input.value);
+} */
+
 // change form setting and show room
 function showRoom() {
   welcome.hidden = true; // hide room entering form
   room.hidden = false; // show message form
   const h3 = room.querySelector("h3"); // find room name element
   h3.innerText = `Room: ${roomName}`; // change room name
-  const form = room.querySelector("form"); // find messaging form element
-  form.addEventListener("submit", handleMessageSubmit);
+  const msgForm = room.querySelector("#msg"); // find messaging form element
+  // const nameForm = room.querySelector("#name"); // find nickname form element
+  msgForm.addEventListener("submit", handleMessageSubmit);
+  // nameForm.addEventListener("submit", handleNicknameSubmit);
 }
 
 // function for entering room
 function handleRoomSubmit(event) {
   event.preventDefault(); // block default function
-  const input = form.querySelector("input"); // find room name
-  socket.emit("enter_room", input.value, showRoom); // send a message to back-end for entring room
-  roomName = input.value; // change room name
-  input.value = ""; // reset input box
+  const roomname = form.querySelector("#roomname"); // find room name
+  const nickname = form.querySelector("#nickname"); // find room name
+  socket.emit("enter_room", roomname.value, nickname.value, showRoom); // send a message to back-end for entring room
+  roomName = roomname.value; // change room name
+  roomname.value = ""; // reset roomname input box
+  nickname.value = ""; // reset nickname input box
 }
 
 /* event listeners */
@@ -52,13 +63,13 @@ function handleRoomSubmit(event) {
 form.addEventListener("submit", handleRoomSubmit);
 
 // connecting room event
-socket.on("welcome", () => {
-  addMessage("someone joined.");
+socket.on("welcome", (user) => {
+  addMessage(`${user} joined.`);
 });
 
 // disconneing room event
-socket.on("bye", () => {
-  addMessage("someone left.");
+socket.on("bye", (left) => {
+  addMessage(`${left} left.`);
 });
 
 socket.on("new_message", addMessage);
