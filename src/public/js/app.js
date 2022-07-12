@@ -1,42 +1,43 @@
-// io(): automatically connect to back-end socket.io
-const socket = io();
-
-const welcome = document.getElementById("welcome");
-const form = welcome.querySelector("form");
-const room = document.getElementById("room");
+/* variables & initialization */
+const socket = io(); // automatically connect to back-end socket.io
+const welcome = document.getElementById("welcome"); // div of form
+const form = welcome.querySelector("form"); // form for entering room
+const room = document.getElementById("room"); // form for sending message
 
 room.hidden = true;
-
 let roomName = "";
 
+/* functions */
+// show messages from other sockets
 function addMessage(message) {
-  const ul = room.querySelector("ul");
-  const li = document.createElement("li");
-  li.innerText = message;
-  ul.appendChild(li);
+  const ul = room.querySelector("ul"); // find message list
+  const li = document.createElement("li"); // create new message element
+  li.innerText = message; // add the message to the message element
+  ul.appendChild(li); // add the message to the message list
 }
 
+// change form setting and show room
 function showRoom() {
-  welcome.hidden = true;
-  room.hidden = false;
-  const h3 = room.querySelector("h3");
-  h3.innerText = `Room: ${roomName}`;
+  welcome.hidden = true; // hide room entering form
+  room.hidden = false; // show message form
+  const h3 = room.querySelector("h3"); // find room name element
+  h3.innerText = `Room: ${roomName}`; // change room name
 }
 
+// function for entering room
 function handleRoomSubmit(event) {
-  event.preventDefault();
-  const input = form.querySelector("input");
-  /* send event with arguments
-   * can call a function from server
-   * backendDone is checking function and should be the last arguments
-   */
-  socket.emit("enter_room", input.value, showRoom);
-  roomName = input.value;
-  input.value = "";
+  event.preventDefault(); // block default function
+  const input = form.querySelector("input"); // find room name
+  socket.emit("enter_room", input.value, showRoom); // send a message to back-end for entring room
+  roomName = input.value; // change room name
+  input.value = ""; // reset input box
 }
 
+/* event listeners */
+// form for entring room event
 form.addEventListener("submit", handleRoomSubmit);
 
+// entering room event
 socket.on("welcome", () => {
   addMessage("someone joined.");
 });

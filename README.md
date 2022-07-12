@@ -37,5 +37,5 @@ chat service with NodeJS, WebRTC, Websockets
 
 - realtime, bidirection, event-based communication framework
 - can emit specific(any) event
-- can send variable arguments with variable types
+- can send event with variable arguments and variable types
 - reconnection
