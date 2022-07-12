@@ -1,10 +1,18 @@
-Zoom clone using NodeJS, WebRTC, Websockets
+# chat service project
 
-# nodemon
+chat service with NodeJS, WebRTC, Websockets
+
+## functions
+
+- creating chat room
+
+# dependencies
+
+## nodemon
 
 - auto restart server
 
-# babel
+## babel
 
 - JS transpiler
 - essentails : core, cli
@@ -12,32 +20,22 @@ Zoom clone using NodeJS, WebRTC, Websockets
   - preset-env : ES6+ to ES5
   - node : transpile & execution
 
-# pug
+## pug
 
 - view engine
 
-# express
+## express
 
 - web framework for NodeJS
 
-# WebSocket
+## WebSocket
 
 - can send only defined evnt
 - can send only string
 
-# SocketIO
+## SocketIO
 
 - realtime, bidirection, event-based communication framework
 - can emit specific(any) event
 - can send variable arguments with variable types
 - reconnection
-
-# tips
-
-1. npm init -y
-
-   - initialize with default option
-
-2. npm i () -D
-
-   - install for devDependencies
