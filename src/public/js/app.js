@@ -16,12 +16,26 @@ function addMessage(message) {
   ul.appendChild(li); // add the message to the message list
 }
 
+// sending message
+function handleMessageSubmit(event) {
+  event.preventDefault();
+  const input = room.querySelector("input"); // find message box
+  const value = input.value; // store value of input
+  socket.emit("new_message", input.value, roomName, () => {
+    // send message to a room
+    addMessage(`You: ${value}`); // show sent message
+  });
+  input.value = ""; // reset input box
+}
+
 // change form setting and show room
 function showRoom() {
   welcome.hidden = true; // hide room entering form
   room.hidden = false; // show message form
   const h3 = room.querySelector("h3"); // find room name element
   h3.innerText = `Room: ${roomName}`; // change room name
+  const form = room.querySelector("form"); // find messaging form element
+  form.addEventListener("submit", handleMessageSubmit);
 }
 
 // function for entering room
@@ -37,7 +51,14 @@ function handleRoomSubmit(event) {
 // form for entring room event
 form.addEventListener("submit", handleRoomSubmit);
 
-// entering room event
+// connecting room event
 socket.on("welcome", () => {
   addMessage("someone joined.");
 });
+
+// disconneing room event
+socket.on("bye", () => {
+  addMessage("someone left.");
+});
+
+socket.on("new_message", addMessage);

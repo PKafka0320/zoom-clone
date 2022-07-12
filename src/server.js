@@ -37,6 +37,13 @@ wsServer.on("connection", (socket) => {
     done(); // send a message that sequence is done
     socket.to(roomName).emit("welcome");
   });
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach((room) => socket.to(room).emit("bye")); // send event to rooms that the socket connected
+  });
+  socket.on("new_message", (msg, room, done) => {
+    socket.to(room).emit("new_message", msg); // send event to a room that the socket wants to send message
+    done();
+  });
 });
 
 // openieng server

@@ -4,7 +4,7 @@ chat service with NodeJS, WebRTC, Websockets
 
 ## functions
 
-- creating chat room
+- creating & entering chat room
 
 # dependencies
 
