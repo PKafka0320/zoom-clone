@@ -22,6 +22,16 @@ Zoom clone using NodeJS, WebRTC, Websockets
 
 # WebSocket
 
+- can send only defined evnt
+- can send only string
+
+# SocketIO
+
+- realtime, bidirection, event-based communication framework
+- can emit specific(any) event
+- can send variable arguments with variable types
+- reconnection
+
 # tips
 
 1. npm init -y

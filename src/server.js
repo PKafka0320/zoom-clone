@@ -1,6 +1,6 @@
 import express from "express";
 import http from "http";
-import WebSocket from "ws";
+import SocketIO from "socket.io";
 
 const app = express();
 
@@ -9,30 +9,41 @@ app.set("view engine", "pug");
 // setting directory of views
 app.set("views", __dirname + "/views");
 
-// setting directory of files
+/* setting directory of files
+ * public files will be executed in frontend
+ */
 app.use("/public", express.static(__dirname + "/public"));
-// public files will be executed in frontend
 
 // rendering for each address
 app.get("/", (req, res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"));
 
-// create http server
-// for views, static files, home, redirection
-const server = http.createServer(app);
-// create web socket server
-const wss = new WebSocket.Server({ server });
+/* create http server
+ *for views, static files, home, redirection
+ */
+const httpServer = http.createServer(app);
 
-// socket fucntion
-function onSocketClose() {
-  console.log("Disconnected from the Browser.");
-}
+/* create io server
+ * need to give host "/socket.io/socket.io.js"(script) so that the host can use websocket
+ * SocketIO is not implementation of websocket
+ */
+const wsServer = SocketIO(httpServer);
+/* // create web socket server
+const wss = new WebSocket.Server({ server }); */
 
-function onSocketMessage(message) {
-  console.log(message.toString());
-}
+wsServer.on("connection", (socket) => {
+  socket.onAny((event) => {
+    console.log(`Socket Event: ${event}`);
+  });
+  socket.on("enter_room", (roomName, done) => {
+    socket.join(roomName);
+    /* run a function in front-end for the purpose of security */
+    done(); // send a message that sequence is done
+    socket.to(roomName).emit("welcome");
+  });
+});
 
-// connected socket list
+/* // connected socket list
 const sockets = [];
 
 // web socket event
@@ -56,6 +67,15 @@ wss.on("connection", (socket) => {
   });
 });
 
+// socket fucntion
+function onSocketClose() {
+  console.log("Disconnected from the Browser.");
+}
+
+function onSocketMessage(message) {
+  console.log(message.toString());
+} */
+
 // openieng server
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
-server.listen(3000, handleListen);
+httpServer.listen(3000, handleListen);
