@@ -63,12 +63,17 @@ function handleRoomSubmit(event) {
 form.addEventListener("submit", handleRoomSubmit);
 
 // connecting room event
-socket.on("welcome", (user) => {
+socket.on("welcome", (user, newCount) => {
+  console.log(newCount);
+  const h3 = room.querySelector("h3"); // find room name element
+  h3.innerText = `Room: ${roomName} (${newCount})`; // change room name and amount of user
   addMessage(`${user} joined.`);
 });
 
 // disconneing room event
-socket.on("bye", (left) => {
+socket.on("bye", (left, newCount) => {
+  const h3 = room.querySelector("h3"); // find room name element
+  h3.innerText = `Room: ${roomName} (${newCount})`; // change room name and amount of user
   addMessage(`${left} left.`);
 });
 
