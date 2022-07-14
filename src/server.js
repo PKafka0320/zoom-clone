@@ -27,24 +27,57 @@ const httpServer = http.createServer(app);
  */
 const wsServer = SocketIO(httpServer);
 
+// find public rooms
+function publicRooms() {
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = wsServer;
+  const publicRooms = []; // public ids list
+  /* sids: private ids
+   * rooms: public & private ids
+   */
+  rooms.forEach((_, key) => {
+    // key: id
+    if (sids.get(key) === undefined) {
+      publicRooms.push(key);
+    }
+  });
+  return publicRooms;
+}
+
 wsServer.on("connection", (socket) => {
   // socket["nickname"] = "Anon"; // initialize nickname
-  socket.onAny((event) => { // show event
-    console.log(`Socket Event: ${event}`);
+  socket.onAny((event) => {
+    // show event
+    console.log(wsServer.sockets.adapter); // adapter
+    console.log(`Socket Event: ${event}`); // socket event
   });
+
   socket.on("enter_room", (roomName, nickname, done) => {
     socket["nickname"] = nickname;
     socket.join(roomName);
     /* run a function in front-end for the purpose of security */
     done(); // send a message that sequence is done
     socket.to(roomName).emit("welcome", socket.nickname);
+    wsServer.sockets.emit("room_change", publicRooms());
   });
-  socket.on("disconnecting", () => { // send event to rooms that the socket connected
+
+  // send event to rooms that the socket connected
+  socket.on("disconnecting", () => {
     socket.rooms.forEach((room) =>
       socket.to(room).emit("bye", socket.nickname)
     );
   });
-  socket.on("new_message", (msg, room, done) => { // send event to a room that the socket wants to send message
+
+  // send list of public rooms to all sockets
+  socket.on("disconnect", () => {
+    wsServer.sockets.emit("room_change", publicRooms());
+  });
+
+  // send event to a room that the socket wants to send message
+  socket.on("new_message", (msg, room, done) => {
     socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
     done();
   });
