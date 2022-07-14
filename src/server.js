@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
-import SocketIO from "socket.io";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 
 const app = express(); // create express application
 
@@ -25,7 +26,16 @@ const httpServer = http.createServer(app);
  * - need to give host "/socket.io/socket.io.js"(script) so that the host can use websocket
  * - SocketIO is not implementation of websocket
  */
-const wsServer = SocketIO(httpServer);
+const wsServer = new Server(httpServer, {
+  cors: {
+    origin: ["https://admin.socket.io"],
+    credentials: true,
+  },
+});
+
+instrument(wsServer, {
+  auth: false,
+});
 
 // find public rooms
 function publicRooms() {

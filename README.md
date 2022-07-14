@@ -41,3 +41,5 @@ chat service with NodeJS, WebRTC, Websockets
 - can emit specific(any) event
 - can send event with variable arguments and variable types
 - reconnection
+
+## @socket.io/admin-ui
