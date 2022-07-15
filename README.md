@@ -1,6 +1,6 @@
 # chat service project
 
-chat service with NodeJS, WebRTC, Websockets
+chat service with NodeJS, Websockets, SocketIO, WebRTC
 
 ## functions
 

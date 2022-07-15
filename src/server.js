@@ -26,8 +26,16 @@ const httpServer = http.createServer(app);
  * - need to give host "/socket.io/socket.io.js"(script) so that the host can use websocket
  * - SocketIO is not implementation of websocket
  */
-const wsServer = SocketIO(httpServer)
+const wsServer = SocketIO(httpServer);
 
 // openieng server
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 httpServer.listen(3000, handleListen);
+
+wsServer.on("connection", (socket) => {
+  socket.on("join_room", (roomName, done) => {
+    socket.join(roomName);
+    done();
+    socket.to(roomName).emit("welcome");
+  });
+});
