@@ -2,12 +2,6 @@
 
 chat service with NodeJS, Websockets, SocketIO, WebRTC
 
-## functions
-
-- creating & entering chat room
-- sending & receiving message
-- setting nickname
-
 # dependencies
 
 ## nodemon

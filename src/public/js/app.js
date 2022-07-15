@@ -34,8 +34,20 @@ socket.on("welcome", async () => {
 });
 
 // event for connection to someone
-socket.on("offer", (offer) => {
-  console.log(offer);
+socket.on("offer", async (offer) => {
+  // set connection with offer
+  myPeerConnection.setRemoteDescription(offer);
+  // create an answer for offer
+  const answer = await myPeerConnection.createAnswer();
+  // configure connection with answer
+  myPeerConnection.setRemoteDescription(answer);
+  socket.emit("answer", answer, roomName);
+});
+
+// event for receiving answer
+socket.on("answer", (answer) => {
+  //  set connection with answer
+  myPeerConnection.setRemoteDescription(answer);
 });
 
 /* RTC Code */
@@ -50,7 +62,7 @@ function makeConnection() {
 }
 
 // get user media device list
-async function getCamers() {
+async function getCameras() {
   try {
     // get all media devices
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -93,7 +105,7 @@ async function getMedia(deviceId) {
     myFace.srcObject = myStream;
     // get camera list for only first time
     if (!deviceId) {
-      await getCamers();
+      await getCameras();
     }
   } catch (e) {
     console.log(e);
@@ -134,18 +146,19 @@ async function handleCameraChange() {
 }
 
 // handle entering room event
-function handleWelcomeSubmit(event) {
+async function handleWelcomeSubmit(event) {
   event.preventDefault();
   const input = welcomeForm.querySelector("input");
-  socket.emit("join_room", input.value, startMedia);
-  roomname = input.value;
+  await initCall();
+  socket.emit("join_room", input.value);
+  roomName = input.value;
   input.value = "";
 }
 
 // start to get media
-function startMedia() {
+async function initCall() {
   welcome.hidden = true;
   call.hidden = false;
-  getMedia();
+  await getMedia();
   makeConnection();
 }

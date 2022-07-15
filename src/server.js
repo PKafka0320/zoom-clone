@@ -35,14 +35,18 @@ httpServer.listen(3000, handleListen);
 // Socket event
 wsServer.on("connection", (socket) => {
   // connecting to someone
-  socket.on("join_room", (roomName, done) => {
+  socket.on("join_room", (roomName) => {
     socket.join(roomName);
-    done();
     socket.to(roomName).emit("welcome");
   });
 
   // sending offer
   socket.on("offer", (offer, roomName) => {
     socket.to(roomName).emit("offer", offer);
+  });
+
+  // sending answer
+  socket.on("answer", (answer, roomName) => {
+    socket.to(roomName).emit("answer", answer);
   });
 });
