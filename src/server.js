@@ -32,10 +32,17 @@ const wsServer = SocketIO(httpServer);
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 httpServer.listen(3000, handleListen);
 
+// Socket event
 wsServer.on("connection", (socket) => {
+  // connecting to someone
   socket.on("join_room", (roomName, done) => {
     socket.join(roomName);
     done();
     socket.to(roomName).emit("welcome");
+  });
+
+  // sending offer
+  socket.on("offer", (offer, roomName) => {
+    socket.to(roomName).emit("offer", offer);
   });
 });

@@ -13,6 +13,7 @@ let myStream; // user stream
 let roomName;
 let muted = false;
 let cameraOff = false;
+let myPeerConnection;
 
 call.hidden = true;
 
@@ -21,9 +22,32 @@ cameraBtn.addEventListener("click", handleCameraClick);
 cameraSelect.addEventListener("input", handleCameraChange);
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
-socket.on("welcome", () => {
-  console.log("Someone joined.");
+/* Socket Code */
+// event for connection from someone
+socket.on("welcome", async () => {
+  // create an offer(invitation) for participant
+  const offer = await myPeerConnection.createOffer();
+  // configure connection with offer
+  myPeerConnection.setLocalDescription(offer);
+  console.log("Send the offer.");
+  socket.emit("offer", offer, roomName);
 });
+
+// event for connection to someone
+socket.on("offer", (offer) => {
+  console.log(offer);
+});
+
+/* RTC Code */
+// make connection of Peer-to=Peer
+function makeConnection() {
+  // create Peer-to-Peer connection
+  myPeerConnection = new RTCPeerConnection();
+  // put camera & mic data stream to connection
+  myStream
+    .getTracks()
+    .forEach((track) => myPeerConnection.addTrack(track, myStream));
+}
 
 // get user media device list
 async function getCamers() {
@@ -123,4 +147,5 @@ function startMedia() {
   welcome.hidden = true;
   call.hidden = false;
   getMedia();
+  makeConnection();
 }
