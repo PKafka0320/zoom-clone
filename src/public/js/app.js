@@ -50,7 +50,7 @@ socket.on("offer", async (offer) => {
   // create an answer for offer
   const answer = await myPeerConnection.createAnswer();
   // configure connection with answer
-  myPeerConnection.setRemoteDescription(answer);
+  myPeerConnection.setLocalDescription(answer);
   socket.emit("answer", answer, roomName);
   console.log("Sent the answer.");
 });
