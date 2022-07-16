@@ -1,6 +1,7 @@
-# chat service project
+Chat service with NodeJS, WebSockets, SocketIO, WebRTC
 
-chat service with NodeJS, Websockets, SocketIO, WebRTC
+Project is for the purpose of studying WebSocket, SocketIO, WebRTC.
+The code is changed in sequence of using Websocket, SocketIO, WebRTC and end with WebRTC.
 
 # dependencies
 
@@ -35,5 +36,3 @@ chat service with NodeJS, Websockets, SocketIO, WebRTC
 - can emit specific(any) event
 - can send event with variable arguments and variable types
 - reconnection
-
-## @socket.io/admin-ui

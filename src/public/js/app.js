@@ -1,4 +1,5 @@
-/* variables & initialization */
+/* front-end */
+
 const socket = io(); // automatically connect to back-end socket.io
 
 const myFace = document.getElementById("myFace");
@@ -10,24 +11,25 @@ const welcomeForm = welcome.querySelector("form");
 const call = document.getElementById("call");
 
 let myStream; // user stream
-let roomName;
-let muted = false;
-let cameraOff = false;
-let myPeerConnection;
-let myDataChannel;
+let roomName; // connected room id
+let muted = false; // default mute setting
+let cameraOff = false; // default camera setting
+let myPeerConnection; // connected user stream
+let myDataChannel; // data channel of connected users
 
-call.hidden = true;
+call.hidden = true; // default set of showing room
 
-muteBtn.addEventListener("click", handleMuteClick);
-cameraBtn.addEventListener("click", handleCameraClick);
-cameraSelect.addEventListener("input", handleCameraChange);
-welcomeForm.addEventListener("submit", handleWelcomeSubmit);
+muteBtn.addEventListener("click", handleMuteClick); // mute on/off event
+cameraBtn.addEventListener("click", handleCameraClick); // camera on/off event
+cameraSelect.addEventListener("input", handleCameraChange); // camera changing event
+welcomeForm.addEventListener("submit", handleWelcomeSubmit); // entering room event
 
 /* Socket Code */
 // event for connection from someone
 socket.on("welcome", async () => {
   // create data channel
   myDataChannel = myPeerConnection.createDataChannel("chat");
+  // chatting between users connected to same data channel
   myDataChannel.addEventListener("message", console.log);
   console.log("Made data channel.");
   // create an offer(invitation) for participant
@@ -40,6 +42,7 @@ socket.on("welcome", async () => {
 
 // event for connection to someone
 socket.on("offer", async (offer) => {
+  // data channel event, direct message from sender (not through server)
   myPeerConnection.addEventListener("datachannel", (event) => {
     myDataChannel = event.channel;
     myDataChannel.addEventListener("message", console.log);

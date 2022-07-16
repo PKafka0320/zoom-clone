@@ -1,3 +1,5 @@
+/* back-end */
+
 import express from "express";
 import http from "http";
 import SocketIO from "socket.io";
@@ -7,9 +9,7 @@ const app = express(); // create express application
 app.set("view engine", "pug"); // setting view engine
 app.set("views", __dirname + "/views"); // setting directory of views
 
-/* setting directory of files
- * public files will be executed in frontend
- */
+/* setting directory of files(scripts) for front-end */
 app.use("/public", express.static(__dirname + "/public"));
 
 // rendering for each address
@@ -27,7 +27,7 @@ const httpServer = http.createServer(app);
  */
 const wsServer = SocketIO(httpServer);
 
-// openieng server
+// openieng server with port 3000
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 httpServer.listen(3000, handleListen);
 
