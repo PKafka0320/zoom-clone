@@ -29,12 +29,13 @@ socket.on("welcome", async () => {
   const offer = await myPeerConnection.createOffer();
   // configure connection with offer
   myPeerConnection.setLocalDescription(offer);
-  console.log("Send the offer.");
+  console.log("Sent the offer.");
   socket.emit("offer", offer, roomName);
 });
 
 // event for connection to someone
 socket.on("offer", async (offer) => {
+  console.log("Received the offer.");
   // set connection with offer
   myPeerConnection.setRemoteDescription(offer);
   // create an answer for offer
@@ -42,23 +43,60 @@ socket.on("offer", async (offer) => {
   // configure connection with answer
   myPeerConnection.setRemoteDescription(answer);
   socket.emit("answer", answer, roomName);
+  console.log("Sent the answer.");
 });
 
 // event for receiving answer
 socket.on("answer", (answer) => {
+  console.log("Received the answer.");
   //  set connection with answer
   myPeerConnection.setRemoteDescription(answer);
 });
 
+// event for candidate
+socket.on("ice", (ice) => {
+  console.log("Received candidate.");
+  myPeerConnection.addIceCandidate(ice);
+});
+
 /* RTC Code */
-// make connection of Peer-to=Peer
+// make connection of Peer-to-Peer
 function makeConnection() {
-  // create Peer-to-Peer connection
-  myPeerConnection = new RTCPeerConnection();
+  // create Peer-to-Peer connection (using STUN server)
+  myPeerConnection = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: [
+          "stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+          "stun:stun2.l.google.com:19302",
+          "stun:stun3.l.google.com:19302",
+          "stun:stun4.l.google.com:19302",
+        ],
+      },
+    ],
+  });
+  // protocol event
+  myPeerConnection.addEventListener("icecandidate", handleIce);
+  // registering add stream event
+  myPeerConnection.addEventListener("addstream", handleAddStream);
   // put camera & mic data stream to connection
   myStream
     .getTracks()
     .forEach((track) => myPeerConnection.addTrack(track, myStream));
+}
+
+// handle candidate
+function handleIce(data) {
+  console.log("Sent candidate.");
+  socket.emit("ice", data.candidate, roomName);
+}
+
+// register add stream
+function handleAddStream(data) {
+  console.log("Got an event from peer.");
+  const peerFace = document.getElementById("peerFace");
+  peerFace.srcObject = data.stream;
 }
 
 // get user media device list
@@ -143,6 +181,14 @@ function handleCameraClick() {
 // apply camera change
 async function handleCameraChange() {
   await getMedia(cameraSelect.value);
+  if (myPeerConnection) {
+    const videoTrack = myStream.getVideoTracks()[0];
+    // find video device of sender from peer connection
+    const videoSender = myPeerConnection
+      .getSenders()
+      .find((sender) => sender.track.kind === "video");
+    videoSender.replaceTrack(videoTrack);
+  }
 }
 
 // handle entering room event
