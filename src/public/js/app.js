@@ -14,6 +14,7 @@ let roomName;
 let muted = false;
 let cameraOff = false;
 let myPeerConnection;
+let myDataChannel;
 
 call.hidden = true;
 
@@ -25,6 +26,10 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 /* Socket Code */
 // event for connection from someone
 socket.on("welcome", async () => {
+  // create data channel
+  myDataChannel = myPeerConnection.createDataChannel("chat");
+  myDataChannel.addEventListener("message", console.log);
+  console.log("Made data channel.");
   // create an offer(invitation) for participant
   const offer = await myPeerConnection.createOffer();
   // configure connection with offer
@@ -35,6 +40,10 @@ socket.on("welcome", async () => {
 
 // event for connection to someone
 socket.on("offer", async (offer) => {
+  myPeerConnection.addEventListener("datachannel", (event) => {
+    myDataChannel = event.channel;
+    myDataChannel.addEventListener("message", console.log);
+  });
   console.log("Received the offer.");
   // set connection with offer
   myPeerConnection.setRemoteDescription(offer);
