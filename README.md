@@ -1,3 +1,5 @@
+# Project explanation
+
 Chat service with NodeJS, WebSockets, SocketIO, WebRTC
 
 Project is for the purpose of studying WebSocket, SocketIO, WebRTC.
